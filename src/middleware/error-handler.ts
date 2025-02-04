@@ -1,14 +1,20 @@
 import {NextFunction, Request, Response} from 'express';
+import {CustomAPIError} from '../errors/custom-api';
+import {StatusCodes} from 'http-status-codes';
 
-export class ValidationError extends Error {
-}
 
-export const handleError = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err);
+export const handleError = (err: CustomAPIError, _req: Request, res: Response, _next: NextFunction) => {
+    console.error(`Middleware handleError: ${err}`);
+
+
+    let customError = {
+        statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+        msg: err.message || 'Something went wrong, try again later',
+    };
 
     res
-        .status(err instanceof ValidationError ? 400 : 500)
+        .status(customError.statusCode)
         .json({
-            message: err instanceof ValidationError ? err.message : 'Sorry, please try again later.'
+            msg: customError.msg || 'Sorry, please try again later.'
         });
 };
