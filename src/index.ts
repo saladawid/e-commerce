@@ -1,18 +1,17 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import 'express-async-errors';
+import dotenv from 'dotenv';
+import express from 'express';
+import morgan from 'morgan';
 import {connectDB} from './db/connect';
-import {notFound} from './middleware/not-found';
 import {handleError} from './middleware/error-handler';
-import {router as authRouter} from './routes/authRoutes';
-
+import {notFound} from './middleware/not-found';
+import {router as authRouter} from './routes/auth.routes';
+import {router as userRourter} from './routes/user.routes';
 
 dotenv.config();
 const port = process.env.PORT || 3000;
 const app = express();
-
 
 const start = async () => {
     try {
@@ -36,10 +35,12 @@ app.use(express.json());
 
 app.get('/api/v1', (req, res) => {
     res.send('Hello World');
-    console.log(req.cookies);
+    console.log(1, req.cookies);
+    console.log(2, req.signedCookies.token);
 
 });
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRourter);
 
 app.use(notFound);
 app.use(handleError);
